@@ -1,0 +1,1 @@
+{"version":3,"file":"sendGrid.js","sourceRoot":"","sources":["../../../src/lib/sendGrid.ts"],"names":[],"mappings":"AAAA,OAAO,MAAM,MAAM,gBAAgB,CAAA;AACnC,MAAM,CAAC,SAAS,CAAC,uEAAuE,CAAC,CAAA;AAWzF,MAAM,CAAC,MAAM,SAAS,GAAG,KAAK,EAAE,GAAmB,EAAE,EAAE;IACnD,OAAO,MAAM,MAAM;SACd,IAAI,CAAC,GAAG,CAAC,CAAA;AAClB,CAAC,CAAA"}

@@ -1,0 +1,1 @@
+{"version":3,"file":"likeproduct.validator.js","sourceRoot":"","sources":["../../../src/validators/likeproduct.validator.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,GAAG,MAAM,KAAK,CAAA;AAE1B,MAAM,CAAC,MAAM,oBAAoB,GAAG,GAAG,CAAC,MAAM,CAAC;IAC3C,MAAM,EAAE,GAAG,CAAC,MAAM,EAAE,CAAC,QAAQ,CAAC,qBAAqB,CAAC;CACvD,CAAC,CAAA"}
