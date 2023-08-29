@@ -1,1 +1,0 @@
-{"version":3,"file":"brand.validators.js","sourceRoot":"","sources":["../../../src/validators/brand.validators.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,GAAG,MAAM,KAAK,CAAA;AAE1B,MAAM,CAAC,MAAM,oBAAoB,GAAG,GAAG,CAAC,MAAM,CAAC;IAC3C,IAAI,EAAE,GAAG,CAAC,MAAM,EAAE,CAAC,QAAQ,CAAC,mBAAmB,CAAC;IAChD,KAAK,EAAE,GAAG,CAAC,OAAO,EAAE,CAAC,QAAQ,CAAC,oBAAoB,CAAC;CACtD,CAAC,CAAA"}
