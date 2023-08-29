@@ -8,7 +8,7 @@ interface IInvoice {
 
 
 const invoiceSchema = new mongoose.Schema<IInvoice>({
-    items: [{ type: mongoose.Schema.Types.ObjectId, ref: "Orders" }],
+    items: [{ type: mongoose.Schema.Types.ObjectId, ref: "temporders" }],
     stripe_session_id: String,
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
 }, {

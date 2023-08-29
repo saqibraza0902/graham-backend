@@ -1,5 +1,5 @@
 import express from 'express'
-import { createAdd, deleteAdd, disableAdd, getAllAdds, getDescriptionPageAddWithDetails, getSingleAdd, searchAdds, unableAdd, updateAdd } from '../../controllers/USER/add.user.controller.js';
+import { change_add_status, createAdd, deleteAdd, disableAdd, getAllAdds, getDescriptionPageAddWithDetails, getSingleAdd, searchAdds, unableAdd, updateAdd, user_adds_with_pagination } from '../../controllers/USER/add.user.controller.js';
 import { attachTokenUserId, requireSignInMiddleware } from '../../middlewares/index.js';
 const router = express.Router()
 
@@ -22,5 +22,10 @@ router.patch('/unable/add/:id', requireSignInMiddleware, unableAdd)
 // GET DESCRIPTION PAGE ADD WITH DETAILS
 router.get("/add-description-page/:id", attachTokenUserId, getDescriptionPageAddWithDetails)
 
-// 
+// GET USER ADDS WITH FILTRATION
+router.get("/user_adds_with_pagination", requireSignInMiddleware, user_adds_with_pagination)
+
+// CHANGE ADD STATUS API.
+router.post("/add-status/:pid", requireSignInMiddleware, change_add_status)
+
 export default router;

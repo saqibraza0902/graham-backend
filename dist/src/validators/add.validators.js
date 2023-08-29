@@ -1,5 +1,6 @@
 import * as Yup from 'yup';
 import { RENTED_AS_ENUM } from '../models/Add.model.js';
+import { ORDER_PROCESS_STATUS_ENUM } from '../utils/enums.js';
 export const createAddValidator = Yup.object({
     add_title: Yup.string().required("Add title is required."),
     add_description: Yup.string().required("Add description is required."),
@@ -47,8 +48,6 @@ export const createAddValidator = Yup.object({
         lat: Yup.number().required("Latitude is required."),
         long: Yup.number().required("Longitude is required."),
     }),
-    start_date: Yup.string().required("Start date is required."),
-    end_date: Yup.string().required("End date is required."),
     plan: Yup.object({
         amount: Yup.number(),
         duration_in_days: Yup.number(),
@@ -57,5 +56,12 @@ export const createAddValidator = Yup.object({
 });
 export const getUserPostsWithPaginationValidator = Yup.object({
     userId: Yup.string().required("User Id is required.")
+});
+export const changeAddStatusValidator = Yup.object({
+    status: Yup.boolean().required("Status is required.")
+});
+export const change_order_process_status_validator = Yup.object({
+    order_id: Yup.string().required("Order ID is required"),
+    process_status: Yup.string().oneOf(Object.values(ORDER_PROCESS_STATUS_ENUM)).required("Process status is required")
 });
 //# sourceMappingURL=add.validators.js.map

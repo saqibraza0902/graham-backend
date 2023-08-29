@@ -7,7 +7,7 @@ export enum SubscriptionNameEnum {
 export interface ISubscription {
     name: SubscriptionNameEnum
     duration_in_days: number
-    draft: boolean
+    draft: boolean 
     amount: number
 }
 const subscriptionSchema = new mongoose.Schema<ISubscription>({

@@ -12,7 +12,7 @@ export var RENTED_AS_ENUM;
     RENTED_AS_ENUM["MONTH"] = "MONTH";
     RENTED_AS_ENUM["YEAR"] = "YEAR";
 })(RENTED_AS_ENUM || (RENTED_AS_ENUM = {}));
-var LocationTypeEnum;
+export var LocationTypeEnum;
 (function (LocationTypeEnum) {
     LocationTypeEnum["Point"] = "Point";
 })(LocationTypeEnum || (LocationTypeEnum = {}));
@@ -75,8 +75,6 @@ const addSchema = new mongoose.Schema({
         lat: Number,
         long: Number,
     },
-    start_date: Date,
-    end_date: Date,
     plan: {
         amount: Number,
         duration_in_days: Number,

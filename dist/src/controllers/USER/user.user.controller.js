@@ -3,6 +3,8 @@ import { ORDER_STATUS_ENUM } from "../../utils/enums.js";
 import Add from "../../models/Add.model.js";
 import { CreateResponse } from "../../utils/user/CreateResponse.js";
 import mongoose from "mongoose";
+import { stripe } from "../../lib/stripe.js";
+import BankAccount from "../../models/BankAccount.model.js";
 export const seller_account_analytics = async (req, res) => {
     try {
         const uid = new mongoose.Types.ObjectId(req.user._id);
@@ -23,6 +25,32 @@ export const seller_account_analytics = async (req, res) => {
                 total_earnings
             }, res, statusCode: 200
         });
+    }
+    catch (error) {
+        return CreateResponse({ data: { msg: error.message }, res, statusCode: 500 });
+    }
+};
+export const create_user_onboarding_account = async (req, res) => {
+    try {
+        const uid = req.user._id;
+        const account = await stripe.accounts.create({ type: "express", metadata: { user_acount: "user_account" } });
+        const newBankAccount = await BankAccount.create({
+            account_id: account.id,
+            user: uid,
+        });
+        const accountLink = await stripe.accountLinks.create({
+            account: newBankAccount.account_id,
+            return_url: `${process.env.STRIPE_CONNECT_SUCCESS}?account=${newBankAccount._id}`,
+            refresh_url: `${process.env.STRIPE_CONNECT_REFRESH}?account=${newBankAccount._id}`,
+            type: "account_onboarding",
+        });
+        const params = new URLSearchParams();
+        for (const [key, value] of Object.entries(accountLink)) {
+            params.append(key, value);
+        }
+        const searchParamsString = params.toString();
+        const url = `${accountLink.url}?${searchParamsString}`;
+        return CreateResponse({ data: url, res, statusCode: 200 });
     }
     catch (error) {
         return CreateResponse({ data: { msg: error.message }, res, statusCode: 500 });

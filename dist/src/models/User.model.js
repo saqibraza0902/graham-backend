@@ -82,7 +82,7 @@ const userModel = new mongoose.Schema({
         type: String,
         enum: ACCOUNT_STATUS_ENUM,
         default: ACCOUNT_STATUS_ENUM.ACTIVATED
-    }
+    },
 }, {
     timestamps: true
 });

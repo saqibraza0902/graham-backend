@@ -1,23 +1,37 @@
 import { CreateResponse } from "../../utils/user/CreateResponse.js";
-import { createAddValidator } from "../../validators/add.validators.js";
-import Add from "../../models/Add.model.js";
+import { changeAddStatusValidator, createAddValidator } from "../../validators/add.validators.js";
+import Add, { LocationTypeEnum } from "../../models/Add.model.js";
 import { UploadImage } from "../../lib/imageUpload.js";
 import LikedProduct from "../../models/LikeProduct.model.js";
 import { isValidMongooseId } from "../../utils/isValidMongooseId.js";
+import TempAdd from "../../models/TempAdd.model.js";
+import { create_plan_checkout_session } from "../../lib/stripe_functions/create_plan_chekcout_session.js";
 export const createAdd = async (req, res) => {
     try {
         let body = await createAddValidator.validate(req.body);
-        body.end_date = new Date(body.end_date);
-        body.start_date = new Date(body.start_date);
         let cloudImage = [];
         for (let index = 0; index < body.images.length; index++) {
             const url = await UploadImage(body.images[index]);
             cloudImage.push(url.secure_url);
         }
+        // for geo near 
         // @ts-ignore
         body.location.coordinates = [parseFloat(body.location.long), parseFloat(body.location.lat)];
-        const add = await Add.create({ ...body, created_by: req.user._id, images: cloudImage });
-        return CreateResponse({ data: add, res, statusCode: 200 });
+        // handle payment...
+        if (body?.plan?.name && body?.plan?.amount > 0) {
+            const tempAdd = await TempAdd.create({ ...body, created_by: req.user._id, images: cloudImage });
+            const session_id = await create_plan_checkout_session(body.plan.amount, body.plan.name, String(tempAdd._id));
+            if (session_id) {
+                return CreateResponse({ data: { payment: true, session_id }, res, statusCode: 200 });
+            }
+            else {
+                return CreateResponse({ data: 'Something went wrong try again later', res, statusCode: 400 });
+            }
+        }
+        else {
+            const add = await Add.create({ ...body, created_by: req.user._id, images: cloudImage });
+            return CreateResponse({ data: add, res, statusCode: 200 });
+        }
     }
     catch (error) {
         return CreateResponse({ data: { msg: error.message }, res, statusCode: 500 });
@@ -48,10 +62,18 @@ export const updateAdd = async (req, res) => {
             return CreateResponse({ data: { msg: 'Unauthorized.' }, res, statusCode: 400 });
         }
         let body = await createAddValidator.validate(req.body);
-        body.end_date = new Date(body.end_date);
-        body.start_date = new Date(body.start_date);
-        // for (let index = 0; index < body.images.length; index++) {
-        // }
+        for (let index = 0; index < body.images.length; index++) {
+            // https mean the image is uploaded.
+            if (!body.images[index].includes("https")) {
+                const uploaded_image = await UploadImage(body.images[index]);
+                body.images[index] = uploaded_image.secure_url;
+            }
+        }
+        // for geo near 
+        // @ts-ignore
+        body.location.coordinates = [parseFloat(body.location.long), parseFloat(body.location.lat)];
+        // @ts-ignore
+        body.location.type = LocationTypeEnum.Point;
         await Add.findByIdAndUpdate(id, {
             $set: {
                 ...body
@@ -273,6 +295,54 @@ export const getDescriptionPageAddWithDetails = async (req, res) => {
             }
         }
         return CreateResponse({ data: { add: dbAdd, liked, totalCreatedProducts, suggestedProducts }, res, statusCode: 200 });
+    }
+    catch (error) {
+        return CreateResponse({ data: { msg: error.message }, res, statusCode: 500 });
+    }
+};
+export const user_adds_with_pagination = async (req, res) => {
+    try {
+        let { limit, page, title } = req.query;
+        page = page ?? 1;
+        limit = limit ?? 5;
+        const skip = (page - 1) * limit;
+        const uid = req.user._id;
+        let searchQuery = {
+            created_by: uid
+        };
+        if (title) {
+            searchQuery["add_title"] = { $regex: title, $options: 'i' };
+        }
+        const products = await Add.find(searchQuery).limit(limit).skip(skip);
+        const totalDocuments = await Add.count(searchQuery);
+        return CreateResponse({ data: { products, totalDocuments }, res, statusCode: 200 });
+    }
+    catch (error) {
+        return CreateResponse({ data: { msg: error.message }, res, statusCode: 500 });
+    }
+};
+export const change_add_status = async (req, res) => {
+    try {
+        const { pid } = req.params;
+        const body = await changeAddStatusValidator.validate(req.body);
+        const uid = req.user._id;
+        const isValid = isValidMongooseId(pid);
+        if (!isValid) {
+            return CreateResponse({ data: { msg: 'Invalid product' }, res, statusCode: 400 });
+        }
+        const dbProduct = await Add.findById(pid);
+        if (!dbProduct) {
+            return CreateResponse({ data: { msg: 'Product not found' }, res, statusCode: 400 });
+        }
+        if (String(dbProduct.created_by) !== String(uid)) {
+            return CreateResponse({ data: { msg: 'Unauthorized.' }, res, statusCode: 400 });
+        }
+        await Add.findByIdAndUpdate(pid, {
+            $set: {
+                disabled: body.status
+            }
+        });
+        return CreateResponse({ data: { msg: 'success.' }, res, statusCode: 200 });
     }
     catch (error) {
         return CreateResponse({ data: { msg: error.message }, res, statusCode: 500 });

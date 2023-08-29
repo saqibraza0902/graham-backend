@@ -1,6 +1,47 @@
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 import { ORDER_PROCESS_STATUS_ENUM, ORDER_STATUS_ENUM, PAYMENT_STATUS_ENUM } from "../utils/enums.js";
-const orderSchema = new mongoose.Schema({
+
+type TOrderProcessStatus = {
+    date: Date
+    status: ORDER_PROCESS_STATUS_ENUM
+}
+export type Billing_Details = {
+    username: string
+    name: string
+    email: string
+    mobile_number: string
+    city: string
+    zip_code: string
+    state: string
+    country: string
+}
+export interface IOrder {
+    product: Types.ObjectId
+    quantity: number
+    total_price: number
+    buyer: Types.ObjectId
+    seller: Types.ObjectId
+    seller_earned: number
+    start_date: Date
+    end_date: Date
+    time_difference: number
+    taxes: number
+    service_fee: number
+    process_status: TOrderProcessStatus[]
+    payment_status: PAYMENT_STATUS_ENUM
+    order_status: ORDER_STATUS_ENUM
+    billing_details: Billing_Details
+    // *** refunded policy ***
+    refunded: boolean
+    // *** stripe_session_id
+    stripe_session_id: string
+    // *** refund_session_id ***
+    refund_session_id: string
+    // *** refunded_amount ***
+    refunded_amount: number
+}
+
+const tempOrderSchema = new mongoose.Schema<IOrder>({
     product: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Add"
@@ -108,7 +149,9 @@ const orderSchema = new mongoose.Schema({
     }
 }, {
     timestamps: true
-});
-const Order = mongoose.model("Orders", orderSchema);
-export default Order;
-//# sourceMappingURL=Order.js.map
+})
+
+
+const TempOrder = mongoose.model<IOrder>("temporders", tempOrderSchema)
+
+export default TempOrder;

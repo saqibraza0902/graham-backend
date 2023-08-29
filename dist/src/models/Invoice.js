@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 const invoiceSchema = new mongoose.Schema({
-    items: [{ type: mongoose.Schema.Types.ObjectId, ref: "Orders" }],
+    items: [{ type: mongoose.Schema.Types.ObjectId, ref: "temporders" }],
     stripe_session_id: String,
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
 }, {

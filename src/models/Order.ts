@@ -27,10 +27,18 @@ export interface IOrder {
     time_difference: number
     taxes: number
     service_fee: number
-    process_status: [TOrderProcessStatus]
+    process_status: TOrderProcessStatus[]
     payment_status: PAYMENT_STATUS_ENUM
     order_status: ORDER_STATUS_ENUM
     billing_details: Billing_Details
+    // *** refunded policy ***
+    refunded: boolean
+    // *** stripe_session_id
+    stripe_session_id: string
+    // *** refund_session_id ***
+    refund_session_id: string
+    // *** refunded_amount ***
+    refunded_amount: number
 }
 
 const orderSchema = new mongoose.Schema<IOrder>({
@@ -86,19 +94,33 @@ const orderSchema = new mongoose.Schema<IOrder>({
         type: String,
         enum: PAYMENT_STATUS_ENUM,
     },
-    process_status: [
-        {
-            date: {
-                type: Date,
-                required: [true, "Process status date is required."]
-            },
-            status: {
-                type: String,
-                enum: ORDER_PROCESS_STATUS_ENUM,
-                required: [true, "Process status is required."]
+    process_status: {
+        type: [
+            {
+                date: {
+                    type: Date,
+                },
+                status: {
+                    type: String,
+                    enum: ORDER_PROCESS_STATUS_ENUM,
+                }
             }
-        }
-    ],
+        ],
+        default: [
+            {
+                date: new Date(),
+                status: ORDER_PROCESS_STATUS_ENUM.ORDERED
+            },
+            {
+                date: null,
+                status: ORDER_PROCESS_STATUS_ENUM.DELIVERED
+            },
+            {
+                date: null,
+                status: ORDER_PROCESS_STATUS_ENUM.RETURNED
+            },
+        ]
+    },
     billing_details: {
         username: String,
         name: String,
@@ -108,6 +130,22 @@ const orderSchema = new mongoose.Schema<IOrder>({
         zip_code: String,
         state: String,
         country: String,
+    },
+    refunded: {
+        type: Boolean,
+        default: false
+    },
+    stripe_session_id: {
+        type: String,
+        default: ""
+    },
+    refund_session_id: {
+        type: String,
+        default: ""
+    },
+    refunded_amount: {
+        type: Number,
+        default: 0
     }
 }, {
     timestamps: true

@@ -3,23 +3,27 @@ dotev.config();
 import express from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
+
 const app = express();
 app.use(cors());
+// *************** Stripe ***********************
+import stripeRoute from './routes/stripe/index.js';
+app.use('/stripe/webhook', stripeRoute);
+// *************** Stripe ***********************
 app.use(express.json({ limit: '50mb' }));
 // mongodb-->
-const mongoURI = process.env.MONGO_URI;
+const mongoURI = process.env.MONGO_URI as string;
 mongoose
-    .connect(mongoURI)
-    .then(async () => {
+  .connect(mongoURI)
+  .then(async () => {
     // handle creation of admins
     try {
-        // await ensureAdminExists()
-    }
-    catch (error) { }
+      // await ensureAdminExists()
+    } catch (error) {}
     // handle creation of admins
     console.log(`DB Connected.`);
-})
-    .catch((err) => console.log(err));
+  })
+  .catch((err) => console.log(err));
 // routes *
 import authRoute from './routes/auth.routes.js';
 import userAddRoute from './routes/USER/add.user.routes.js';
@@ -34,9 +38,11 @@ import addRoute from './routes/add.routes.js';
 import userAdminRoute from './routes/user.routes.js';
 import likedProductRoute from './routes/USER/likedproduct.user.routes.js';
 import adminAuthRoute from './routes/auth.admin.routes.js';
+import { ensureAdminExists } from './lib/ensureAdminExists.js';
 import orderUserRoute from './routes/USER/order.user.routes.js';
 import orderAdminRoute from './routes/order.routes.js';
 import userRouter from './routes/USER/user.user.routes.js';
+
 app.use(authRoute);
 app.use(userAddRoute);
 app.use('/category', categoryRoute);
@@ -56,7 +62,6 @@ app.use('/user', userRouter);
 // routes *
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
-    console.log(`server is running at http://localhost:${PORT}`);
+  console.log(`server is running at http://localhost:${PORT}`);
 });
 export default app;
-//# sourceMappingURL=index.js.map

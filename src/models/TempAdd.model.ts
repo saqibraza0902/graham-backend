@@ -76,7 +76,7 @@ export interface IAdd {
     created_by: Types.ObjectId
     disabled: boolean
 }
-const addSchema = new mongoose.Schema<IAdd>({
+const tempAddSchema = new mongoose.Schema<IAdd>({
     add_title: String,
     add_description: String,
     available_stock: Number,
@@ -151,6 +151,6 @@ const addSchema = new mongoose.Schema<IAdd>({
     timestamps: true
 })
 
-addSchema.index({ location: "2dsphere" })
-const Add = mongoose.model<IAdd>("Add", addSchema)
-export default Add
+tempAddSchema.index({ location: "2dsphere" })
+const TempAdd = mongoose.model<IAdd>("tempadds", tempAddSchema)
+export default TempAdd
