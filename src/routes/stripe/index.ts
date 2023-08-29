@@ -7,8 +7,7 @@ import { verify_plan_checkout_session } from '../../lib/stripe_functions/create_
 const router = express.Router();
 
 let endpointSecret;
-endpointSecret =
-  'whsec_ac568253774580ed6c1d121a22ce6685fadcd79bcd9ac82505b4225ac4852485';
+endpointSecret = 'whsec_pQXqoveXkU8T9viGWUrxDIGjo98kVCEK';
 
 router.post(
   '/create-plan',
